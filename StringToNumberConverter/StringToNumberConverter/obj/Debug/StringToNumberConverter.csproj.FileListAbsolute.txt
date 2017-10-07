@@ -1,0 +1,7 @@
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\bin\Debug\StringToNumberConverter.exe.config
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\bin\Debug\StringToNumberConverter.exe
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\bin\Debug\StringToNumberConverter.pdb
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\obj\Debug\StringToNumberConverter.csprojResolveAssemblyReference.cache
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\obj\Debug\StringToNumberConverter.csproj.CoreCompileInputs.cache
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\obj\Debug\StringToNumberConverter.exe
+C:\Users\Keian\Documents\Employment\Projects\GitHub\KeiansStringToNumberConverter\StringToNumberConverter\StringToNumberConverter\obj\Debug\StringToNumberConverter.pdb
