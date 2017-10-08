@@ -2,21 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace StringToNumberConverter
 {
-    public static class ConverterHelper
+    public class ConverterHelper : IConverterHelper
     {
-        internal static double Convert(string stringValue)
+        public virtual double Convert(string stringValue)
         {
-            var splitString = SplitNumberString(stringValue);
-            var multipliersArray = CalculateMultipliersOfSplitString(splitString);
-            var value = CalculateNumberValue(multipliersArray);
+            double value;
+            if (!Double.TryParse(stringValue, out value))
+            {
+                CheckFormatForNumberString(stringValue);
+                var splitString = SplitNumberString(stringValue);
+                var multipliersArray = CalculateMultipliersOfSplitString(splitString);
+                value = CalculateNumberValue(multipliersArray);
+            }
             return value;
         }
 
-        internal static double CalculateNumberValue(int[] multipliersArray)
+        private void CheckFormatForNumberString(string stringValue)
+        {
+            String incorrectHyphen = "([-][A-Za-z])";
+            if (Regex.IsMatch(stringValue, incorrectHyphen)) throw new Exception();
+
+            // Other rules could be implemented here - e.g. what about sixty-four?
+
+        }
+
+        public virtual double CalculateNumberValue(int[] multipliersArray)
         {
             double value = 0;
             value += multipliersArray[0] * Math.Pow(10, 9);
@@ -27,7 +42,7 @@ namespace StringToNumberConverter
             return value;
         }
 
-        internal static int[] CalculateMultipliersOfSplitString(string[] splitString)
+        public virtual int[] CalculateMultipliersOfSplitString(string[] splitString)
         {
             var multipliersArray = new int[5];
             multipliersArray[0] = ConvertNumberSmallerThanThousand(splitString[0]);
@@ -38,23 +53,29 @@ namespace StringToNumberConverter
             return multipliersArray;
         }
 
-        private static int FindIfNumberStringIsNegative(string[] splitString)
+        private int FindIfNumberStringIsNegative(string[] splitString)
         {
-            foreach(var str in splitString)
+            // Pattern used to find the case e.g. -1 billion, - 1 billion
+            String minusPattern1 = "([-][1-9])";
+            String minusPattern2 = "([- ][1-9])";
+
+            foreach (var str in splitString)
             {
                 if (str == null) continue;
                 if (str.Contains("negative") ||
-                    str.Contains("minus"))
+                    str.Contains("minus") ||
+                    Regex.IsMatch(str, minusPattern1) ||
+                    Regex.IsMatch(str, minusPattern2))
                 return -1;
             }
             return 1;
         }
 
-        internal static string[] SplitNumberString(string stringValue)
+        public virtual string[] SplitNumberString(string stringValue)
         {
             if (stringValue == null) return new string[] { "" };
 
-            var stringWithoutCommas = stringValue.Replace(",", String.Empty).ToLower() ;
+            var stringWithoutCommas = stringValue.Replace(",", String.Empty);
 
             var splitString = stringWithoutCommas.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
             var indexOfBillion = CalculateIndexOfBillion(splitString);
@@ -64,7 +85,7 @@ namespace StringToNumberConverter
             return CombineNumberStringByComponents(splitString, indexOfBillion, indexOfMillion, indexOfLastThousand);
         }
 
-        internal static string[] CombineNumberStringByComponents(
+        public string[] CombineNumberStringByComponents(
             string[] splitString, int indexOfBillion, int indexOfMillion, int indexOfLastThousand)
         {
             if (splitString == null) return new string[4];
@@ -83,29 +104,48 @@ namespace StringToNumberConverter
                 combinedStringArray[1] += splitString[i] + " ";
             }
             if (combinedStringArray[1] != null)
+            {
                 combinedStringArray[1] = combinedStringArray[1].Replace(
                 " " + NumberWordDescriptions.million.ToString() + " ", String.Empty);
+                combinedStringArray[1] = combinedStringArray[1].Replace("and ", String.Empty);
+            }
             for (; i < indexOfLastThousand + 1; i++)
             {
                 combinedStringArray[2] += splitString[i] + " ";
             }
             if (combinedStringArray[2] != null)
+            {
                 combinedStringArray[2] = combinedStringArray[2].Replace(
                 " " + NumberWordDescriptions.thousand.ToString() + " ", String.Empty);
-            for (; i < splitString.Length; i++)
+                combinedStringArray[2] = combinedStringArray[2].Replace("and ", String.Empty);
+            }
+                for (; i < splitString.Length; i++)
             {
                 combinedStringArray[3] += splitString[i] + " ";
             }
             if (combinedStringArray[3] != null)
+            {
                 combinedStringArray[3] = combinedStringArray[3].TrimEnd(new char[0]);
+                combinedStringArray[3] = combinedStringArray[3].TrimEnd('.');
+                combinedStringArray[3] = combinedStringArray[3].Replace("and ",String.Empty);
+            }
             return combinedStringArray;
         }
 
-        internal static int ConvertNumberSmallerThanThousand(string stringValue)
+        public int ConvertNumberSmallerThanThousand(string stringValue)
         {
             if (String.IsNullOrWhiteSpace(stringValue)) return 0;
 
             int value = 0;
+
+            stringValue = stringValue.Replace("minus ", String.Empty);
+            stringValue = stringValue.Replace("negative ", String.Empty);
+            stringValue = stringValue.Replace("- ", String.Empty);
+            stringValue = stringValue.Replace("-", String.Empty);
+
+            if (Int32.TryParse(stringValue, out value))
+                return value;
+
             var indexOfHundred = stringValue.IndexOf(NumberWordDescriptions.hundred.ToString());
 
             if (indexOfHundred >= 0)
@@ -135,7 +175,7 @@ namespace StringToNumberConverter
             return value;
         }
 
-        private static bool NumberWordIsKnown(string wordToCheck, string numberString)
+        public bool NumberWordIsKnown(string wordToCheck, string numberString)
         {
             // e.g. "SEVENty" and "seven ..." and "... seven" cases covered
             if (numberString.Contains(wordToCheck.ToString() + " ") || (numberString.EndsWith(wordToCheck)))
@@ -144,7 +184,7 @@ namespace StringToNumberConverter
                 return false;
         }
 
-        internal static int CalculateIndexOfBillion(string[] splitString)
+        public int CalculateIndexOfBillion(string[] splitString)
         {
             for(var i = 0; i < splitString.Length; i++)
             {
@@ -159,7 +199,7 @@ namespace StringToNumberConverter
             return -1;
         }
 
-        internal static int CalculateIndexOfMillion(string[] splitString)
+        public int CalculateIndexOfMillion(string[] splitString)
         {
             for (var i = 0; i < splitString.Length; i++)
             {
@@ -174,7 +214,7 @@ namespace StringToNumberConverter
             return -1;
         }
 
-        internal static int CalculateIndexOfLastThousand(string[] splitString)
+        public int CalculateIndexOfLastThousand(string[] splitString)
         {
             int lastIndex = -1;
             for (var i = 0; i < splitString.Length; i++)

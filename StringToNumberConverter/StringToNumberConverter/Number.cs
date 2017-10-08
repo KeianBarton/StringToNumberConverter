@@ -11,10 +11,10 @@ namespace StringToNumberConverter
         private readonly string stringValue;
         private readonly double numberValue;
 
-        public Number(string value)
+        public Number(string value, IConverterHelper converterHelper)
         {
             stringValue = value.ToLower();
-            numberValue = ConverterHelper.Convert(stringValue);
+            numberValue = converterHelper.Convert(stringValue);
         }
 
         public override string ToString()

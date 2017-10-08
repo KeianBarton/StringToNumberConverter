@@ -9,6 +9,7 @@ namespace StringToNumberConverter
     public enum NumberWordDescriptions
     {
         zero = 0,
+        a = 1,
         one = 1,
         two = 2,
         three = 3,

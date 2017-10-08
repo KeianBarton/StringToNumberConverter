@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IConverterHelper.cs" />
     <Compile Include="Number.cs" />
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="NumberWordDescriptions.cs" />
